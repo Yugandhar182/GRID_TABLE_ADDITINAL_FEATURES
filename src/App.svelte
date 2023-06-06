@@ -25,11 +25,11 @@
 		  th: 'gridjs-th',
 		  td: 'gridjs-td',
 		},
-		search: true, // Enable search
-		sort: true, // Enable sorting
+		search: true, // 
+		sort: true, // 
 		pagination: {
-		  enabled: true, // Enable pagination
-		  limit: 10, // Set the number of rows per page
+		  enabled: true, //
+		  limit: 7, // Set the number of rows per page
 		},
 	  }).render(document.getElementById('grid-container'));
 	});
