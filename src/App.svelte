@@ -103,8 +103,8 @@
   
   <div id="grid-container"></div>
   
-  <style global>
-	@import "https://cdn.jsdelivr.net/npm/gridjs/dist/theme/mermaid.min.css";
+  <style >
+	
 	.btn-group {
 	  display: flex;
 	  gap: 5px;
