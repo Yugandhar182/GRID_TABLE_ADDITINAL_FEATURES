@@ -1,115 +1,63 @@
 <script>
-	import { onMount } from 'svelte';
-	import { Grid } from 'gridjs';
-	import 'bootstrap/dist/css/bootstrap.min.css';
-	let grid;
+	import { onMount } from "svelte";
+	import Grid from "gridjs-svelte";
+  
 	let jsonData = [];
+	let tableVisible = false;
   
 	onMount(async () => {
-	  const response = await fetch("https://api.recruitly.io/api/candidate?apiKey=TEST9349C0221517DA4942E39B5DF18C68CDA154");
-	  const responseData = await response.json();
-	  jsonData = responseData.data;
-	  console.log(jsonData, "jsonData");
-	  grid = new Grid({
-		columns: ['firstName', 'surname', 'email', 'mobile', 'Actions'],
-		data: jsonData.map((item) => [
-		  item.firstName,
-		  item.surname,
-		  item.email,
-		  item.mobile,
-		  
-		  createActionsCell(item),
-		]),
-		className: {
-		  table: 'gridjs-table',
-		  th: 'gridjs-th',
-		  td: 'gridjs-td',
-		},
-		search: true, // 
-		sort: true, // 
-		pagination: {
-		  enabled: true, //
-		  limit: 7, // Set the number of rows per page
-		},
-	  }).render(document.getElementById('grid-container'));
+	  await fetchData();
+	  tableVisible = true;
 	});
   
-	function createActionsCell(item) {
-	  const editButton = document.createElement('button');
-	  editButton.className = 'btn btn-primary';
-	  editButton.innerHTML = 'Edit';
-	  editButton.addEventListener('click', () => {
-		handleEdit(item);
-	  });
-  
-	  const deleteButton = document.createElement('button');
-	  deleteButton.className = 'btn btn-danger';
-	  deleteButton.innerHTML = 'Delete';
-	  deleteButton.addEventListener('click', () => {
-		confirmDelete(item);
-	  });
-  
-	  const cell = document.createElement('div');
-	  cell.className = 'btn-group';
-	  cell.appendChild(editButton);
-	  cell.appendChild(deleteButton);
-  
-	  return cell;
+	async function fetchData() {
+	  const response = await fetch("https://api.recruitly.io/api/candidate?apiKey=TEST1236C4CF23E6921C41429A6E1D546AC9535E");
+	  const responseData = await response.json();
+	  jsonData = responseData.data.map(item => ({
+		firstName: item.firstName || "", 
+		surname: item.surname || "",
+		email: item.email || "",
+		mobile: item.mobile || "",
+	  }));
 	}
   
-	async function handleEdit(item) {
-	  // Example: Show edit popup
-	  alert(`Editing ${item.firstName} ${item.surname}`);
-	  // You can replace the alert with your own custom edit logic or open a popup/modal for editing
-	}
-  
-	function confirmDelete(item) {
-	  const confirmed = confirm('Are you sure you want to delete this item?');
-	  if (confirmed) {
-		handleDelete(item);
-	  }
-	}
-  
-	async function handleDelete(item) {
-	  // Handle delete logic here
-	  console.log('Deleting', item);
-  
-	  const apiUrl = `https://api.recruitly.io/api/candidate/${item.id}?apiKey=TEST9349C0221517DA4942E39B5DF18C68CDA154`;
-	  const response = await fetch(apiUrl, {
-		method: 'DELETE',
-		headers: {
-		  'Content-Type': 'application/json'
-		}
-	  });
-  
-	  if (response.ok) {
-		console.log('Item deleted successfully');
-		// Remove the deleted item from the grid
-		jsonData = jsonData.filter((candidate) => candidate.id !== item.id);
-		grid.update({
-		  data: jsonData.map((item) => [
-			item.firstName,
-			item.surname,
-			item.email,
-			item.mobile,
-			createActionsCell(item),
-		  ])
-		});
-	  } else {
-		console.error('Failed to delete item');
-	  }
+	function showPopup(firstName) {
+	  // Define your logic for displaying a popup or performing any action here
+	  console.log(`Showing popup for ${firstName}`);
 	}
   </script>
   
-  <div id="grid-container"></div>
+  <main class="container mt-4">
+	{#if tableVisible}
+	  <Grid
+		search
+		sort
+		pagination={{ enabled: true, limit: 8 }}
+		data={jsonData}
+		columns={[
+		  {
+			name: "firstName",
+			formatter: (cell) => {
+			  const firstName = cell.data;
+			  if (!firstName) {
+				return `<a href="#" on:click={() => showPopup('${firstName}')}>${firstName}</a>`;;
+			  }
+			  
+			}
+		  },
+		  "surname",
+		  "email",
+		  "mobile",
+		]}
+	  />
+	{/if}
+  </main>
   
-  <style >
-	
-	.btn-group {
-	  display: flex;
-	  gap: 5px;
+  <style>
+	@import "https://cdn.jsdelivr.net/npm/gridjs/dist/theme/mermaid.min.css";
+  
+	.gridjs-th {
+	  background-color: yellow;
 	}
   </style>
-  
-  
   
